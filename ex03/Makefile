@@ -5,17 +5,18 @@ SRCS = 	main.cpp\
 			ShrubberyCreationForm.cpp\
 			RobotomyRequestForm.cpp\
 			PresidentialPardonForm.cpp\
+			Intern.cpp\
 
 OBJS = $(SRCS:.cpp=.o)
 
-NAME = AForm
+NAME = Intern
 
 all: $(NAME)
 
 $(NAME):$(OBJS)
 	c++ $(FLAGS) $(OBJS) -o $(NAME)
 
-%.o: %.cpp Bureaucrat.hpp AForm.hpp ShrubberyCreationForm.hpp RobotomyRequestForm.hpp PresidentialPardonForm.hpp
+%.o: %.cpp Bureaucrat.hpp AForm.hpp ShrubberyCreationForm.hpp RobotomyRequestForm.hpp PresidentialPardonForm.hpp Intern.hpp
 	c++ $(FLAGS) -c $< -o $@
 
 clean:
