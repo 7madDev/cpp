@@ -1,4 +1,5 @@
 #include "ScalarConverter.hpp"
+#include <cctype>
 
 ScalarConverter::ScalarConverter() {}
 ScalarConverter::ScalarConverter(const ScalarConverter& src) { (void)src; }
@@ -13,23 +14,89 @@ enum Type {
     INVALID
 };
 
-static Type detectType(const std::string& literal) {
-    if (literal.length() == 3 && literal[0] == '\'' && literal[2] == '\'')
-        return CHAR;
+static bool isValidInt(const std::string& str) {
+    if (str.empty())
+        return false;
     
+    size_t i = 0;
+    
+    if (str[0] == '+' || str[0] == '-')
+        i = 1;
+    
+    while (i < str.length()) {
+        if (!std::isdigit(str[i]))
+            return false;
+        i++;
+    }
+    
+    return true;
+}
+
+static bool isValidDouble(const std::string& str) {
+    size_t i = 0;
+    bool hasDigit = false;
+    bool hasDot = false;
+    
+    if (str[0] == '+' || str[0] == '-')
+        i = 1;
+    
+    if (str[str.length() - 1] == '.')
+        return false;
+    
+    while (i < str.length()) {
+        if (std::isdigit(str[i])) {
+            hasDigit = true;
+        } else if (str[i] == '.') {
+            if (hasDot)
+                return false;
+            hasDot = true;
+        } else {
+            return false;
+        }
+        i++;
+    }
+    
+    return hasDigit && hasDot;
+}
+
+static bool isValidFloat(const std::string& str) {
+    if (str.length() < 2 || str[str.length() - 1] != 'f')
+        return false;
+    
+    std::string withoutF = str.substr(0, str.length() - 1);
+    return isValidDouble(withoutF);
+}
+
+static Type detectType(const std::string& literal) {
+    if (literal.empty())
+        return INVALID;
+
+    if (literal.length() == 1 && !std::isdigit(literal[0]))
+        return CHAR;
+
     if (literal == "nan" || literal == "nanf" ||
         literal == "inf" || literal == "inff" ||
         literal == "+inf" || literal == "+inff" ||
         literal == "-inf" || literal == "-inff")
         return (literal[literal.length() - 1] == 'f') ? FLOAT : DOUBLE;
+
+    if (literal.length() > 0 && literal[literal.length() - 1] == 'f') {
+        if (isValidFloat(literal))
+            return FLOAT;
+        return INVALID;
+    }
+
+    if (literal.find('.') != std::string::npos) {
+        if (isValidDouble(literal))
+            return DOUBLE;
     
-    if (literal[literal.length() - 1] == 'f')
-        return FLOAT;
-    
-    if (literal.find('.') != std::string::npos)
-        return DOUBLE;
-    
-    return INT;
+        return INVALID;
+    }
+
+    if (isValidInt(literal))
+        return INT;
+
+    return INVALID;
 }
 
 static void printChar(double value) {
@@ -77,7 +144,7 @@ void ScalarConverter::convert(const std::string& literal) {
     try {
         switch (type) {
             case CHAR:
-                value = static_cast<double>(literal[1]);
+                value = static_cast<double>(literal[0]);
                 break;
             case INT:
                 value = static_cast<double>(std::atoi(literal.c_str()));
