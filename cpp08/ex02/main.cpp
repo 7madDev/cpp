@@ -1,86 +1,70 @@
-#include "Span.hpp"
+#include "MutantStack.hpp"
 #include <iostream>
-#include <cstdlib>
-#include <ctime>
+#include <list>
 
 int main() {
-    std::cout << "=== Subject Test ===" << std::endl;
+    std::cout << "=== Test with MutantStack ===" << std::endl;
     {
-        Span sp = Span(5);
+        MutantStack<int> mstack;
         
-        sp.addNumber(6);
-        sp.addNumber(3);
-        sp.addNumber(17);
-        sp.addNumber(9);
-        sp.addNumber(11);
+        mstack.push(5);
+        mstack.push(17);
         
-        std::cout << "Shortest span: " << sp.shortestSpan() << std::endl;
-        std::cout << "Longest span: " << sp.longestSpan() << std::endl;
-    }
-    
-    std::cout << "\n=== Exception Tests ===" << std::endl;
-    {
-        Span sp(3);
-        sp.addNumber(1);
-        sp.addNumber(2);
-        sp.addNumber(3);
+        std::cout << "Top: " << mstack.top() << std::endl;
         
-        try {
-            sp.addNumber(4);
-        } catch (std::exception& e) {
-            std::cout << "Exception: " << e.what() << std::endl;
+        mstack.pop();
+        
+        std::cout << "Size: " << mstack.size() << std::endl;
+        
+        mstack.push(3);
+        mstack.push(5);
+        mstack.push(737);
+        mstack.push(0);
+        
+        MutantStack<int>::iterator it = mstack.begin();
+        MutantStack<int>::iterator ite = mstack.end();
+        
+        ++it;
+        --it;
+        
+        std::cout << "Iterating through stack:" << std::endl;
+        while (it != ite) {
+            std::cout << *it << std::endl;
+            ++it;
         }
         
-        Span sp2(1);
-        sp2.addNumber(42);
-        
-        try {
-            sp2.shortestSpan();
-        } catch (std::exception& e) {
-            std::cout << "Exception: " << e.what() << std::endl;
-        }
+        std::stack<int> s(mstack);  // Can convert to std::stack
     }
     
-    std::cout << "\n=== Test with 10,000 numbers ===" << std::endl;
+    std::cout << "\n=== Test with std::list (should be same) ===" << std::endl;
     {
-        Span sp(10000);
+        std::list<int> mstack;
         
-        srand(time(NULL));
-        for (int i = 0; i < 10000; i++) {
-            sp.addNumber(rand());
+        mstack.push_back(5);
+        mstack.push_back(17);
+        
+        std::cout << "Top: " << mstack.back() << std::endl;
+        
+        mstack.pop_back();
+        
+        std::cout << "Size: " << mstack.size() << std::endl;
+        
+        mstack.push_back(3);
+        mstack.push_back(5);
+        mstack.push_back(737);
+        mstack.push_back(0);
+        
+        std::list<int>::iterator it = mstack.begin();
+        std::list<int>::iterator ite = mstack.end();
+        
+        ++it;
+        --it;
+        
+        std::cout << "Iterating through list:" << std::endl;
+        while (it != ite) {
+            std::cout << *it << std::endl;
+            ++it;
         }
-        
-        std::cout << "Shortest span: " << sp.shortestSpan() << std::endl;
-        std::cout << "Longest span: " << sp.longestSpan() << std::endl;
-    }
-    
-    std::cout << "\n=== Range Addition Test ===" << std::endl;
-    {
-        Span sp(10);
-        
-        std::vector<int> vec;
-        for (int i = 0; i < 10; i++) {
-            vec.push_back(i * 10);
-        }
-        
-        sp.addRange(vec.begin(), vec.end());
-        
-        std::cout << "Added " << vec.size() << " numbers using range" << std::endl;
-        std::cout << "Shortest span: " << sp.shortestSpan() << std::endl;
-        std::cout << "Longest span: " << sp.longestSpan() << std::endl;
-    }
-    
-    std::cout << "\n=== Negative Numbers Test ===" << std::endl;
-    {
-        Span sp(5);
-        sp.addNumber(-10);
-        sp.addNumber(-5);
-        sp.addNumber(0);
-        sp.addNumber(5);
-        sp.addNumber(10);
-        
-        std::cout << "Shortest span: " << sp.shortestSpan() << std::endl;
-        std::cout << "Longest span: " << sp.longestSpan() << std::endl;
     }
     
     return 0;

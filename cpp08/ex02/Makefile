@@ -1,16 +1,16 @@
 FLAGS = -Wall -Wextra -Werror -std=c++98
-SRCS = 	main.cpp Span.cpp
+SRCS = 	main.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
-NAME = Span
+NAME = MutantStack
 
 all: $(NAME)
 
 $(NAME):$(OBJS)
 	c++ $(FLAGS) $(OBJS) -o $(NAME)
 
-%.o: %.cpp Span.hpp
+%.o: %.cpp MutantStack.hpp
 	c++ $(FLAGS) -c $< -o $@
 
 clean:
